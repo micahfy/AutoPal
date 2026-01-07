@@ -2,7 +2,7 @@
 ## Title: AutoPal
 ## Notes: 圣骑治疗一键插件
 ## Author: AutoPal
-## Version: 1.06
+## Version: 1.07
 ## SavedVariablesPerCharacter: AutoPalSaved
 
 Bindings.xml

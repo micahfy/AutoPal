@@ -12,7 +12,7 @@ AutoPalSaved = AutoPalSaved or {}
 
 local AP = AutoPal
 
-AP.Version = "1.06"
+AP.Version = "1.07"
 AP.UI = {}
 AP.Monitor = nil
 AP.MinimapButton = nil
@@ -804,32 +804,18 @@ local function APCreateMinimapButton()
     button.background:SetHeight(24)
     button.background:SetPoint("CENTER", 0, 0)
 
-    button:SetNormalTexture("Interface\\Icons\\Spell_Holy_HolyLight")
-    local normal = button:GetNormalTexture()
-    if normal then
-        normal:SetWidth(24)
-        normal:SetHeight(24)
-        normal:SetPoint("CENTER", 0, 0)
-        normal:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-    end
+    button.icon = button:CreateTexture(nil, "ARTWORK")
+    button.icon:SetTexture("Interface\\Icons\\inv_pet_cats_siamesecat")
+    button.icon:SetWidth(24)
+    button.icon:SetHeight(24)
+    button.icon:SetPoint("CENTER", 0, 0)
 
-    button:SetPushedTexture("Interface\\Icons\\Spell_Holy_HolyLight")
-    local pushed = button:GetPushedTexture()
-    if pushed then
-        pushed:SetWidth(24)
-        pushed:SetHeight(24)
-        pushed:SetPoint("CENTER", 1, -1)
-        pushed:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-    end
-
-    button:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square")
-    local highlight = button:GetHighlightTexture()
-    if highlight then
-        highlight:SetBlendMode("ADD")
-        highlight:SetWidth(24)
-        highlight:SetHeight(24)
-        highlight:SetPoint("CENTER", 0, 0)
-    end
+    button.highlight = button:CreateTexture(nil, "HIGHLIGHT")
+    button.highlight:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
+    button.highlight:SetBlendMode("ADD")
+    button.highlight:SetWidth(24)
+    button.highlight:SetHeight(24)
+    button.highlight:SetPoint("CENTER", 0, 0)
 
     button.UpdatePosition = function(self)
         if AutoPalSaved.MinimapX and AutoPalSaved.MinimapY then
