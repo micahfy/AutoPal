@@ -12,7 +12,7 @@ AutoPalSaved = AutoPalSaved or {}
 
 local AP = AutoPal
 
-AP.Version = "1.03"
+AP.Version = "1.05"
 AP.UI = {}
 AP.Monitor = nil
 AP.MinimapButton = nil
@@ -788,35 +788,43 @@ local function APCreateMinimapButton()
     end
 
     local button = CreateFrame("Button", "AutoPalMinimapButton", Minimap)
-    button:SetFrameStrata("MEDIUM")
+    button:SetFrameStrata("HIGH")
     button:SetWidth(32)
     button:SetHeight(32)
-    button:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
+    button:SetFrameLevel(1)
     button:EnableMouse(true)
     button:SetMovable(true)
     button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     button:RegisterForDrag("LeftButton")
-    button:SetScript("OnDragStart", function(self)
-        self:SetScript("OnUpdate", self.OnUpdatePosition)
-    end)
-    button:SetScript("OnDragStop", function(self)
-        self:SetScript("OnUpdate", nil)
-        self:UpdatePosition()
-    end)
 
-    local icon = button:CreateTexture(nil, "BACKGROUND")
-    icon:SetTexture("Interface\\Icons\\Spell_Holy_HolyLight")
-    icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-    icon:SetAllPoints(button)
-    button.Icon = icon
+    button.background = button:CreateTexture(nil, "BACKGROUND")
+    button.background:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcons")
+    button.background:SetTexCoord(0.5, 1, 0.5, 1)
+    button.background:SetWidth(24)
+    button.background:SetHeight(24)
+    button.background:SetPoint("CENTER", 0, 0)
 
-    local border = button:CreateTexture(nil, "OVERLAY")
-    border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
-    border:SetAllPoints(button)
+    button.icon = button:CreateTexture(nil, "ARTWORK")
+    button.icon:SetTexture("Interface\\Icons\\Spell_Holy_HolyLight")
+    button.icon:SetWidth(24)
+    button.icon:SetHeight(24)
+    button.icon:SetPoint("CENTER", 0, 0)
+
+    button.highlight = button:CreateTexture(nil, "HIGHLIGHT")
+    button.highlight:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
+    button.highlight:SetBlendMode("ADD")
+    button.highlight:SetWidth(24)
+    button.highlight:SetHeight(24)
+    button.highlight:SetPoint("CENTER", 0, 0)
 
     button.UpdatePosition = function(self)
+        if AutoPalSaved.MinimapX and AutoPalSaved.MinimapY then
+            self:ClearAllPoints()
+            self:SetPoint("CENTER", Minimap, "CENTER", AutoPalSaved.MinimapX, AutoPalSaved.MinimapY)
+            return
+        end
         local angle = AutoPalSaved.MinimapPos or 225
-        local radius = 78
+        local radius = 80
         local rad = math.rad(angle)
         local x = math.cos(rad) * radius
         local y = math.sin(rad) * radius
@@ -824,19 +832,40 @@ local function APCreateMinimapButton()
         self:SetPoint("CENTER", Minimap, "CENTER", x, y)
     end
 
-    button.OnUpdatePosition = function(self)
-        local x, y = GetCursorPosition()
-        local scale = Minimap:GetEffectiveScale()
-        local centerX, centerY = Minimap:GetCenter()
-        x = x / scale - centerX
-        y = y / scale - centerY
-        local angle = math.deg(APAtan2(y, x))
-        if angle < 0 then
-            angle = angle + 360
+    button:SetScript("OnDragStart", function()
+        local btn = this or button
+        if btn then
+            btn.isDragging = true
         end
-        AutoPalSaved.MinimapPos = angle
-        self:UpdatePosition()
-    end
+    end)
+    button:SetScript("OnDragStop", function()
+        local btn = this or button
+        if btn then
+            btn.isDragging = false
+        end
+    end)
+
+    button:SetScript("OnUpdate", function()
+        local btn = this or button
+        if not btn or not btn.isDragging then
+            return
+        end
+        local mx, my = Minimap:GetCenter()
+        local px, py = GetCursorPosition()
+        mx = mx * UIParent:GetScale()
+        my = my * UIParent:GetScale()
+
+        local angle = APAtan2(py - my, px - mx)
+        local x = math.cos(angle) * 80
+        local y = math.sin(angle) * 80
+
+        btn:ClearAllPoints()
+        btn:SetPoint("CENTER", Minimap, "CENTER", x, y)
+
+        AutoPalSaved.MinimapX = x
+        AutoPalSaved.MinimapY = y
+        AutoPalSaved.MinimapPos = math.deg(angle)
+    end)
 
     button:SetScript("OnClick", function(_, btn)
         if btn == "LeftButton" then
