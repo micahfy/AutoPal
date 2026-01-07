@@ -1,0 +1,9 @@
+## Interface: 11200
+## Title: AutoPal
+## Notes: 圣骑治疗一键插件
+## Author: AutoPal
+## Version: 1.03
+## SavedVariablesPerCharacter: AutoPalSaved
+
+Bindings.xml
+AutoPal.lua
