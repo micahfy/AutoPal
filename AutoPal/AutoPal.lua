@@ -12,7 +12,7 @@ AutoPalSaved = AutoPalSaved or {}
 
 local AP = AutoPal
 
-AP.Version = "1.08"
+AP.Version = "1.09"
 AP.UI = {}
 AP.Monitor = nil
 AP.MinimapButton = nil
@@ -867,8 +867,8 @@ local function APCreateMinimapButton()
         AutoPalSaved.MinimapPos = math.deg(angle)
     end)
 
-    button:SetScript("OnClick", function(self, click)
-        local btn = click or arg1
+    button:SetScript("OnClick", function()
+        local btn = arg1
         if btn == "LeftButton" then
             APCreateUI()
             if AP.UI and AP.UI.Frame then
