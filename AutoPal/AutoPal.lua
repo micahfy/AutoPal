@@ -12,7 +12,7 @@ AutoPalSaved = AutoPalSaved or {}
 
 local AP = AutoPal
 
-AP.Version = "1.07"
+AP.Version = "1.08"
 AP.UI = {}
 AP.Monitor = nil
 AP.MinimapButton = nil
@@ -867,7 +867,8 @@ local function APCreateMinimapButton()
         AutoPalSaved.MinimapPos = math.deg(angle)
     end)
 
-    button:SetScript("OnClick", function(_, btn)
+    button:SetScript("OnClick", function(self, click)
+        local btn = click or arg1
         if btn == "LeftButton" then
             APCreateUI()
             if AP.UI and AP.UI.Frame then
@@ -960,6 +961,8 @@ local function APCreateUI()
     frame:SetWidth(380)
     frame:SetHeight(360)
     frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+    frame:SetFrameStrata("DIALOG")
+    frame:SetToplevel(true)
     frame:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
