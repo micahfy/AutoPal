@@ -12,7 +12,7 @@ AutoPalSaved = AutoPalSaved or {}
 
 local AP = AutoPal
 
-AP.Version = "1.09"
+AP.Version = "1.11"
 AP.UI = {}
 AP.Monitor = nil
 AP.MinimapButton = nil
@@ -674,6 +674,8 @@ local function APBuildMonitorText()
         .. "  审判:" .. APBoolText(AutoPalSaved.UseJudgeWisdom)
 end
 
+local APCreateUI
+
 local function APUIUpdateSliderText(slider, label, value)
     local text = _G[slider:GetName() .. "Text"]
     if text then
@@ -868,7 +870,7 @@ local function APCreateMinimapButton()
     end)
 
     button:SetScript("OnClick", function()
-        local btn = arg1
+        local btn = arg1 or "LeftButton"
         if btn == "LeftButton" then
             APCreateUI()
             if AP.UI and AP.UI.Frame then
@@ -885,10 +887,11 @@ local function APCreateMinimapButton()
     end)
 
     button:SetScript("OnEnter", function(self)
-        if not GameTooltip then
+        local owner = self or this
+        if not GameTooltip or not owner then
             return
         end
-        GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+        GameTooltip:SetOwner(owner, "ANCHOR_LEFT")
         GameTooltip:AddLine("AutoPal")
         GameTooltip:AddLine("左键：打开/关闭设置", 1, 1, 1)
         GameTooltip:AddLine("右键：启用/禁用插件", 1, 1, 1)
@@ -913,7 +916,11 @@ local function APUI_CreateCheckButton(parent, name, label, x, y, key)
         text:SetText(label)
     end
     btn:SetScript("OnClick", function(self)
-        AutoPalSaved[key] = self:GetChecked() and 1 or 0
+        local target = self or this
+        if not target then
+            return
+        end
+        AutoPalSaved[key] = target:GetChecked() and 1 or 0
         APUpdateDisplay()
     end)
     return btn
@@ -940,19 +947,23 @@ local function APUI_CreateSlider(parent, name, label, x, y, key)
     end
 
     slider:SetScript("OnValueChanged", function(self, value)
+        local target = self or this
+        if not target then
+            return
+        end
         if AP.UI and AP.UI.InRefresh then
             return
         end
         value = math.floor(value + 0.5)
         AutoPalSaved[key] = value
-        APUIUpdateSliderText(self, label, value)
+        APUIUpdateSliderText(target, label, value)
         APUpdateDisplay()
     end)
 
     return slider
 end
 
-local function APCreateUI()
+APCreateUI = function()
     if AP.UI and AP.UI.Frame then
         return
     end
